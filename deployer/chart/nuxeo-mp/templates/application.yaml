@@ -1,0 +1,114 @@
+{{- $portForwardCommand := printf "kubectl port-forward --namespace %s svc/%s %d:%d" .Release.Namespace (include "nuxeo.fullname" .Subcharts.nuxeo) (.Values.nuxeo.service.internalPort | int) (.Values.nuxeo.service.externalPort | int) -}}
+{{- $localhostAddress := printf "http://localhost:%d/" (.Values.nuxeo.service.internalPort | int) -}}
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: "{{ .Release.Name }}"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/name: "{{ .Release.Name }}"
+  annotations:
+    kubernetes-engine.cloud.google.com/icon: >-
+      data:image/png;base64,{{ .Files.Get "logo.png" | b64enc }}
+    marketplace.cloud.google.com/deploy-info: '{"partner_id": "001Kf000012fpnZIAQ", "product_id": "nuxeo", "partner_name": "Hyland Software Inc."}'
+spec:
+  descriptor:
+    type: Nuxeo
+    version: "{{ .Values.nuxeo.image.tag }}"
+    description: >-
+      Hyland's cloud-native and low-code Nuxeo Platform is a rapid deployment tool for application development and enterprise modernization in the cloud.<br>
+      Google does not offer support for this solution. However, community support is available on
+      [Nuxeo Forum ](https://connect.hyland.com/t5/nuxeo-forum/bd-p/nuxeo1forum-board).
+    maintainers:
+    - name: Hyland's Nuxeo Platform
+      url: https://www.hyland.com/en/solutions/products/nuxeo-platform
+    links:
+    - description: 'User Guide: Nuxeo Kubernetes App for Google Cloud Marketplace'
+      url: https://github.com/nuxeo/nuxeo-gcp-marketplace
+    - description: Getting Started with Nuxeo
+      url: https://doc.nuxeo.com/
+    notes: |-
+      ### Access Nuxeo service
+
+      {{- if .Values.nuxeo.ingress.enabled }}
+      To get the external IP of your Nuxeo server, use the following command:
+
+      ```shell
+      SERVICE_IP=$(kubectl get ingress {{ template "nuxeo.fullname" .Subcharts.nuxeo }} \
+        --namespace {{ .Release.Namespace }} \
+        --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+      ```
+
+      <br>Then, you can reach Nuxeo at https://${SERVICE_IP}/
+      {{- else }}
+      The Kubernetes cluster is not detected to have Ingress support, or it was explicitly disabled. Though, it is possible to connect to Nuxeo without exposing it to public access.
+
+      To do this, you can connect from a container inside the Kubernetes cluster using the following hostname: `{{ template "nuxeo.fullname" .Subcharts.nuxeo }}.{{ .Release.Namespace }}.svc.cluster.local`.
+
+      You can also use port forwarding by running the following command:
+
+      ```shell
+      {{ $portForwardCommand }}
+      ```
+
+      <br>Then, access the Nuxeo server with [{{ $localhostAddress }}]({{ $localhostAddress }}).
+      {{- end }}
+
+      ### Print application logs:
+
+      Run the following command:
+
+      ```shell
+      kubectl logs -n {{ .Release.Namespace }} -f -l app.kubernetes.io/instance={{ .Release.Name }} --prefix --tail -1
+      ````
+
+      {{- (include "nuxeo.warnings.message" .Subcharts.nuxeo) | indent 6 }}
+  info:
+  - name: Nuxeo chart version
+    value: "{{ .Subcharts.nuxeo.Chart.Version }}"
+  - name: Nuxeo image repository
+    value: "{{ .Values.nuxeo.image.repository }}"
+  - name: Nuxeo image tag
+    value: "{{ .Values.nuxeo.image.tag }}"
+  - name: Architecture
+    value: "{{ include "nuxeo.architecture" .Subcharts.nuxeo }}"
+  {{- if .Values.nuxeo.ingress.enabled }}
+  - name: Nuxeo site address
+    type: Reference
+    valueFrom:
+      ingressRef:
+        name: "{{ template "nuxeo.fullname" .Subcharts.nuxeo }}"
+        protocol: HTTPS
+  {{- else }}
+  - name: Forward Nuxeo port
+    value: "{{ $portForwardCommand }}"
+  - name: Nuxeo site address
+    value: "{{ $localhostAddress }}"
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: "{{ .Release.Name }}"
+  addOwnerRef: true 
+  componentKinds:
+  - group: ''
+    kind: ConfigMap
+  - group: apps
+    kind: Deployment
+  {{- if .Values.nuxeo.ingress.enabled }}
+  - group: 'networking.k8s.io'
+    kind: Ingress
+  {{- end }}
+  {{- if .Values.nuxeo.persistentVolumeStorage.enabled }}
+  - group: ''
+    kind: PersistentVolumeClaim
+  {{- end }}
+  {{- if (include "nuxeo.poddisruptionbudget.enabled" .Subcharts.nuxeo) }}
+  - group: 'policy'
+    kind: PodDisruptionBudget
+  {{- end }}
+  - group: ''
+    kind: Secret
+  - group: ''
+    kind: Service
+  - group: ''
+    kind: ServiceAccount
