@@ -1,0 +1,6 @@
+properties:
+  image:
+    type: string
+    default: $REGISTRY/tester:$TAG
+    x-google-property:
+      type: IMAGE

@@ -1,0 +1,8 @@
+actions:
+- name: Nuxeo running status should be OK
+  bashTest:
+    script: |-
+      /scripts/running-status.sh http://{{ .Env.APP_INSTANCE_NAME }}-nuxeo/nuxeo 5
+    expect:
+      exitCode:
+        equals: 0

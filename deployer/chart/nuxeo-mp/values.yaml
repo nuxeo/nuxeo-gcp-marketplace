@@ -1,0 +1,17 @@
+nuxeo:
+  image:
+    repository: us-east1-docker.pkg.dev/hyl-is-marketplace/nuxeo/nuxeo
+    tag: 1.0.0
+  serviceAccount:
+    create: false
+  ingress:
+    # true if `INGRESS_AVAILABLE` is true, aka the cluster has an Ingress controller
+    enabled: false
+    className: null
+    hostname: null
+    path: null
+    tls:
+      secretName: nuxeo-tls
+tls:
+  base64EncodedPrivateKey: null
+  base64EncodedCertificate: null

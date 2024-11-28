@@ -1,0 +1,250 @@
+x-google-marketplace:
+  schemaVersion: v2
+  applicationApiVersion: v1beta1
+  publishedVersion: '1.0.0'
+  publishedVersionMetadata:
+    releaseNote: >-
+      First release.
+    recommended: true
+  images:
+    nuxeo:
+      properties:
+        nuxeo.image.repository:
+          type: REPO_WITH_REGISTRY
+        nuxeo.image.tag:
+          type: TAG
+  clusterConstraints:
+    resources:
+    - replicas: 1
+      requests:
+        cpu: '2'
+        memory: '4Gi'
+    istio:
+      type: UNSUPPORTED
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  nuxeo.serviceAccount.name:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: >
+          Nuxeo deployment service account.
+        roles:
+        - type: Role
+          rulesType: PREDEFINED
+          rulesFromRoleName: view
+  nuxeo.ingress.enabled:
+    type: boolean
+    x-google-marketplace:
+      type: INGRESS_AVAILABLE
+  nuxeo.ingress.className:
+    title: Nuxeo Ingress class name
+    type: string
+  nuxeo.ingress.hostname:
+    title: Nuxeo Ingress host
+    type: string
+  nuxeo.ingress.path:
+    title: Nuxeo Ingress path
+    type: string
+  certificate:
+    type: string
+    x-google-marketplace:
+      type: TLS_CERTIFICATE
+      tlsCertificate:
+        generatedProperties:
+          base64EncodedPrivateKey: tls.base64EncodedPrivateKey
+          base64EncodedCertificate: tls.base64EncodedCertificate
+  nuxeo.service.type:
+    title: Nuxeo service type
+    type: string
+    default: ClusterIP
+  nuxeo.virtualHost:
+    title: Nuxeo virtual host configuration property
+    type: string
+  nuxeo.architecture:
+    title: Nuxeo architecture
+    type: string
+    default: singleNode
+    enum:
+    - 'singleNode'
+    - 'api-worker'
+  nuxeo.replicaCount:
+    title: Number of Nuxeo pods
+    type: integer
+    default: 1
+  nuxeo.resources.requests.cpu:
+    title: Nuxeo pod CPU resource request
+    type: string
+    default: '2'
+  nuxeo.resources.requests.memory:
+    title: Nuxeo container memory resource request
+    type: string
+    default: '4Gi'
+  nuxeo.resources.limits.memory:
+    title: Nuxeo container memory resource limit
+    type: string
+    default: '4Gi'
+  nuxeo.packages:
+    title: Nuxeo packages to install at startup, separated by a space
+    type: string
+  nuxeo.clid:
+    title: Nuxeo CLID, required for package installation
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  nuxeo.mongodb.enabled:
+    title: Enable MongoDB backend for Nuxeo
+    type: boolean
+    default: false
+  nuxeo.mongodb.host:
+    title: Host for MongoDB connection
+    type: string
+  nuxeo.mongodb.auth.enabled:
+    title: Enable MongoDB authentication
+    type: boolean
+    default: false
+  nuxeo.mongodb.auth.username:
+    title: MongoDB authentication username
+    type: string
+  nuxeo.mongodb.auth.password:
+    title: MongoDB authentication password
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  nuxeo.mongodb.auth.existingSecret:
+    title: 'Existing secret with MongoDB credentials (keys: mongodb-username, mongodb-password), overrides username and password'
+    type: string
+  nuxeo.elasticsearch.enabled:
+    title: Enable Elasticsearch for Nuxeo
+    type: boolean
+    default: false
+  nuxeo.elasticsearch.host:
+    title: Host for Elasticsearch connection
+    type: string
+  nuxeo.elasticsearch.indexNumberOfReplicas:
+    title: Host for Elasticsearch connection
+    type: integer
+    default: 0
+  nuxeo.elasticsearch.auth.enabled:
+    title: Enable Elasticsearch authentication
+    type: boolean
+    default: false
+  nuxeo.elasticsearch.auth.username:
+    title: Elasticsearch authentication username
+    type: string
+  nuxeo.elasticsearch.auth.password:
+    title: Elasticsearch authentication password
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  nuxeo.elasticsearch.auth.existingSecret:
+    title: 'Existing secret with Elasticsearch credentials (keys: elasticsearch-username, elasticsearch-password), overrides username and password'
+    type: string
+  nuxeo.kafka.enabled:
+    title: Enable Kafka for Nuxeo
+    type: boolean
+    default: false
+  nuxeo.kafka.host:
+    title: Host for Kafka connection
+    type: string
+  nuxeo.kafka.auth.enabled:
+    title: Enable SASL Kafka authentication
+    type: boolean
+    default: false
+  nuxeo.kafka.auth.username:
+    title: Kafka SASL authentication username
+    type: string
+  nuxeo.kafka.auth.password:
+    title: Kafka SASL authentication password
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  nuxeo.kafka.auth.existingSecret:
+    title: 'Existing secret with Kafka credentials (keys: kafka-username, kafka-password), overrides username and password'
+    type: string
+  nuxeo.googleCloudStorage.enabled:
+    title: Enable Google Cloud Storage for Nuxeo
+    type: boolean
+    default: false
+  nuxeo.googleCloudStorage.auth.projectId:
+    title: Google Cloud Storage project ID
+    type: string
+  nuxeo.googleCloudStorage.auth.credentials:
+    title: Google Cloud Storage credentials
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  nuxeo.googleCloudStorage.auth.existingSecret:
+    title: 'Existing secret with Google Cloud Storage credentials (keys: gcs-project-id, gcs-credentials), overrides projectId and credentials'
+    type: string
+  nuxeo.googleCloudStorage.bucket:
+    title: Google Cloud Storage bucket name
+    type: string
+  nuxeo.googleCloudStorage.bucketPrefix:
+    type: string
+    title: "Google Cloud Storage bucket prefix, needs to end with '/'"
+  nuxeo.persistentVolumeStorage.enabled:
+     title: Enable persistent volume storage for Nuxeo binaries
+     type: boolean
+     default: false
+  nuxeo.persistentVolumeStorage.storageClass:
+    title: Nuxeo binaries persistent volume storage class
+    type: string
+  nuxeo.persistentVolumeStorage.size:
+    title: Nuxeo binaries persistent volume size
+    type: string
+    default: '2Gi'
+  nuxeo.logs.persistence.enabled:
+    title: Enable persistent volume storage for Nuxeo logs
+    type: boolean
+    default: false
+  nuxeo.logs.persistence.storageClass:
+    title: Nuxeo logs persistent volume storage class
+    type: string
+  nuxeo.logs.persistence.size:
+    title: Nuxeo logs persistent volume size
+    type: string
+    default: '2Gi'
+  nuxeo.metrics.enabled:
+    title: Enable Nuxeo global metrics
+    type: boolean
+    default: true
+  nuxeo.metrics.streams.enabled:
+    title: Enable stream metrics reporter for Nuxeo Stream introspection
+    type: boolean
+    default: true
+  nuxeo.metrics.stackDriver.enabled:
+    title: Enable Google Stackdriver metrics reporter
+    type: boolean
+    default: false
+  nuxeo.metrics.stackDriver.gcpProjectId:
+    title: Google Stackdriver metrics project ID
+    type: string
+  nuxeo.metrics.stackDriver.tracing.enabled:
+    title: Enable Google Stackdriver tracing system
+    type: boolean
+    default: false
+  nuxeo.metrics.stackDriver.tracing.timeout:
+    title: Google Stackdriver tracing timeout
+    type: string
+  nuxeo.podSecurityContext.fsGroup:
+    title: Group ID for the volumes of the Nuxeo pod(s)
+    type: integer
+    default: 1000
+  nuxeo.podDisruptionBudget.minAvailable:
+    title: Minimum number of Nuxeo pods that must be available during a disruption.
+    type: string
+  nuxeo.podDisruptionBudget.maxUnavailable:
+    title: Maximum number of pods that can be unavailable during a disruption
+    type: string
+required:
+- name
+- namespace

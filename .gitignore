@@ -1,0 +1,7 @@
+# system/backups
+*~
+*.bak
+.DS_Store
+
+# chart packages
+*.tgz
