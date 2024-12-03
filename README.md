@@ -350,6 +350,93 @@ delete the cluster using this command:
 gcloud container clusters delete "$CLUSTER" --zone "$ZONE"
 ```
 
+## Development
+
+### Prerequisites
+
+You are connected with `glcoud` to a test GKE cluster in a given project, that can be retrieved this way:
+
+```shell
+export GCP_PROJECT=$(gcloud config get-value project | tr ':' '/')
+```
+
+There is an Artifact Registry in this GCP project, for instance:
+
+```shell
+us-east1-docker.pkg.dev/$GCP_PROJECT/nuxeo
+```
+
+A Nuxeo image has been pushed to this registry, for instance:
+
+```shell
+us-east1-docker.pkg.dev/$GCP_PROJECT/nuxeo/nuxeo:1.0.0
+```
+
+You've read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
+
+First, you need to update the chart dependencies to fetch the `nuxeo` subchart locally.
+
+```shell
+helm dependency update deployer/chart/nuxeo-mp/
+```
+
+### Run the verification tests
+
+Configure the registry and tag of the deployer and tester images:
+
+```shell
+export REGISTRY=us-east1-docker.pkg.dev/$GCP_PROJECT/nuxeo
+export TAG="1.0.0"
+```
+
+Build and push the deployer and tester images, then run the tests:
+
+```shell
+docker build --build-arg REGISTRY=$REGISTRY --build-arg TAG=$TAG --tag $REGISTRY/deployer:$TAG deployer \
+  && docker push $REGISTRY/deployer:$TAG \
+  && docker build --tag $REGISTRY/tester:$TAG tester \
+  && docker push $REGISTRY/tester:$TAG \
+  && mpdev verify --deployer=$REGISTRY/deployer:$TAG
+```
+
+You can have a look at the [Verification system](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/verification-integration.md) documentation and the [Dev container references](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
+
+### Deploy a test application
+
+Create a test namespace.
+
+```shell
+kubectl create namespace test-namespace
+```
+
+Delete the previous test application.
+
+```shell
+kubectl delete application test-deployment \
+  --namespace=test-namespace \
+  --ignore-not-found=true
+```
+
+Wait for the `test-deployment-nuxeo` Ingress object to be actually deleted, it can take a while.
+
+You can also delete the deployer Job instead of the whole Application:
+
+```shell
+kubectl delete job test-deployment-deployer \
+  --namespace=test-namespace \
+  --ignore-not-found=true
+```
+
+Build the deployer image and install the application in the test namespace.
+
+```shell
+docker build --build-arg REGISTRY=$REGISTRY --build-arg TAG=$TAG --tag $REGISTRY/deployer:$TAG deployer \
+  && docker push $REGISTRY/deployer:$TAG \
+  && mpdev install --deployer=$REGISTRY/deployer:$TAG --parameters='{"name": "test-deployment", "namespace": "test-namespace"}'
+```
+
+You can have a look at the [Helm deployer](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/building-deployer-helm.md#first-deployment) documentation.
+
 ## License
 
 View [license information](https://doc.nuxeo.com/nxdoc/licenses/) for the software contained in the Nuxeo container image.
