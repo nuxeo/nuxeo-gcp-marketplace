@@ -349,3 +349,11 @@ delete the cluster using this command:
 ```shell
 gcloud container clusters delete "$CLUSTER" --zone "$ZONE"
 ```
+
+## License
+
+View [license information](https://doc.nuxeo.com/nxdoc/licenses/) for the software contained in the Nuxeo container image.
+
+As with all container images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
+
+As with any pre-built image, it is the user's responsibility to ensure compliance with all relevant licenses for the software included in the image.
