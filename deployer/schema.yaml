@@ -65,7 +65,7 @@ properties:
   nuxeo.service.type:
     title: Nuxeo service type
     type: string
-    default: ClusterIP
+    default: NodePort
   nuxeo.virtualHost:
     title: Nuxeo virtual host configuration property
     type: string
