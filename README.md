@@ -363,13 +363,13 @@ export GCP_PROJECT=$(gcloud config get-value project | tr ':' '/')
 There is an Artifact Registry in this GCP project, for instance:
 
 ```shell
-us-east1-docker.pkg.dev/$GCP_PROJECT/nuxeo
+us-docker.pkg.dev/$GCP_PROJECT/nuxeo
 ```
 
 A Nuxeo image has been pushed to this registry, for instance:
 
 ```shell
-us-east1-docker.pkg.dev/$GCP_PROJECT/nuxeo/nuxeo:1.0.0
+us-docker.pkg.dev/$GCP_PROJECT/nuxeo/nuxeo:1.0.0
 ```
 
 You've read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
