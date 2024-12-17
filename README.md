@@ -385,7 +385,7 @@ helm dependency update deployer/chart/nuxeo-mp/
 Configure the registry and tag of the deployer and tester images:
 
 ```shell
-export REGISTRY=us-east1-docker.pkg.dev/$GCP_PROJECT/nuxeo
+export REGISTRY=us-docker.pkg.dev/$GCP_PROJECT/nuxeo
 export TAG="1.0.0"
 ```
 
