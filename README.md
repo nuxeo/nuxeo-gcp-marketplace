@@ -133,13 +133,11 @@ If needed, expose the Service externally and configure Ingress:
 export PUBLIC_SERVICE_AND_INGRESS_ENABLED=true
 ```
 
-> [!WARNING] Warning about GKE Ingress
-
-When using the built-in Ingress controller provided by Google Kubernetes Engine, [GKE Ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress), the `X-Forwarded-Port` request header is not set. Thus, you need to configure it as a [custom request header](https://cloud.google.com/load-balancing/docs/https/custom-headers#working-with-request).
-
-Alternately, you can:
-- Use another Ingress controller such as [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
-- Configure  [Cloud DNS for GKE](https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns), in which case you need to set the `virtualHost` parameter of the `nuxeo` subchart to the DNS hostname, see [Install the Helm chart](#install-the-helm-chart).
+> [!NOTE]
+> Google Kubernetes Engine provides a built-in Ingress controller called [GKE Ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/ingress). Alternately, you can:
+>
+>- Use another Ingress controller, such as [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
+>- Configure  [Cloud DNS for GKE](https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns), in which case you need to set the `virtualHost` parameter of the `nuxeo` subchart to the DNS hostname, see [Install the Helm chart](#install-the-helm-chart).
 
 ##### Create TLS certificate for Nuxeo
 
@@ -330,7 +328,8 @@ export APP_INSTANCE=mynuxeo
 
 #### Delete the resources
 
-> **NOTE:** We recommend using a `kubectl` version that is the same as the
+> [!NOTE]
+> We recommend using a `kubectl` version that is the same as the
 > version of your cluster. Using the same versions of `kubectl` and the cluster
 > helps avoid unforeseen issues.
 
