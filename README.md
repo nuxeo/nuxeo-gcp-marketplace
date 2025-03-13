@@ -371,9 +371,38 @@ A Nuxeo image has been pushed to this registry, for instance:
 us-docker.pkg.dev/$GCP_PROJECT/nuxeo/nuxeo:1.0.0
 ```
 
-You've read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
+For convinience, you can define the following environment variables:
 
-First, you need to update the chart dependencies to fetch the `nuxeo` subchart locally.
+```shell
+export REGISTRY=us-docker.pkg.dev/$GCP_PROJECT/nuxeo
+export TAG="1.0.0"
+```
+
+> [!WARNING]
+> According to the [Requirements for building your container images](https://cloud.google.com/marketplace/docs/partners/kubernetes/create-app-package#application-images), all of your app's images must contain the following annotation in their image manifest:
+>
+> ```json
+> com.googleapis.cloudmarketplace.product.service.name=services/SERVICE_NAME
+> ```
+>
+> Replace `SERVICE_NAME` with the name of your service.
+
+To avoid rebuilding the Nuxeo image, you can add this annotation to the existing image with [crane](https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md).
+
+```shell
+export SERVICE_NAME=nuxeo.endpoints.hyl-is-marketplace.cloud.goog
+crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REGISTRY/nuxeo:$TAG
+```
+
+You can check on the added annotation with:
+
+```shell
+docker buildx imagetools inspect $REGISTRY/nuxeo:$TAG --raw | jq .annotations
+```
+
+Then, read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
+
+Finally, you need to update the chart dependencies to fetch the `nuxeo` subchart locally.
 
 ```shell
 helm dependency update deployer/chart/nuxeo-mp/
@@ -381,20 +410,25 @@ helm dependency update deployer/chart/nuxeo-mp/
 
 ### Run the verification tests
 
-Configure the registry and tag of the deployer and tester images:
-
-```shell
-export REGISTRY=us-docker.pkg.dev/$GCP_PROJECT/nuxeo
-export TAG="1.0.0"
-```
-
 Build and push the deployer and tester images, then run the tests:
 
 ```shell
-docker build --build-arg REGISTRY=$REGISTRY --build-arg TAG=$TAG --tag $REGISTRY/deployer:$TAG deployer \
-  && docker push $REGISTRY/deployer:$TAG \
-  && docker build --tag $REGISTRY/tester:$TAG tester \
-  && docker push $REGISTRY/tester:$TAG \
+docker buildx build \
+  --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
+  --build-arg REGISTRY=$REGISTRY \
+  --build-arg TAG=$TAG \
+  --no-cache \
+  --tag $REGISTRY/deployer:$TAG \
+  --provenance=false \
+  --push \
+  deployer \
+  && docker buildx  build \
+    --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
+    --no-cache \
+    --tag $REGISTRY/tester:$TAG \
+    --provenance=false \
+    --push \
+    tester \
   && mpdev verify --deployer=$REGISTRY/deployer:$TAG
 ```
 
@@ -429,9 +463,18 @@ kubectl delete job test-deployment-deployer \
 Build the deployer image and install the application in the test namespace.
 
 ```shell
-docker build --build-arg REGISTRY=$REGISTRY --build-arg TAG=$TAG --tag $REGISTRY/deployer:$TAG deployer \
-  && docker push $REGISTRY/deployer:$TAG \
-  && mpdev install --deployer=$REGISTRY/deployer:$TAG --parameters='{"name": "test-deployment", "namespace": "test-namespace"}'
+docker buildx build \
+  --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
+  --build-arg REGISTRY=$REGISTRY \
+  --build-arg TAG=$TAG \
+  --no-cache \
+  --tag $REGISTRY/deployer:$TAG \
+  --provenance=false \
+  --push \
+  deployer \
+  && mpdev install \
+    --deployer=$REGISTRY/deployer:$TAG \
+    --parameters='{"name": "test-deployment", "namespace": "test-namespace"}'
 ```
 
 You can have a look at the [Helm deployer](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/building-deployer-helm.md#first-deployment) documentation.
