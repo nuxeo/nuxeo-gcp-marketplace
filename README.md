@@ -365,10 +365,11 @@ There is an Artifact Registry in this GCP project, for instance:
 us-docker.pkg.dev/$GCP_PROJECT/nuxeo
 ```
 
-A Nuxeo image has been pushed to this registry, for instance:
+A Nuxeo image and a [metering agent](https://github.com/GoogleCloudPlatform/ubbagent) image have been pushed to this registry, for instance:
 
 ```shell
 us-docker.pkg.dev/$GCP_PROJECT/nuxeo/nuxeo:1.0.0
+us-docker.pkg.dev/$GCP_PROJECT/nuxeo/ubbagent:1.0.0
 ```
 
 For convinience, you can define the following environment variables:
@@ -387,11 +388,12 @@ export TAG="1.0.0"
 >
 > Replace `SERVICE_NAME` with the name of your service.
 
-To avoid rebuilding the Nuxeo image, you can add this annotation to the existing image with [crane](https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md).
+To avoid rebuilding the images, you can add this annotation to the existing images with [crane](https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md).
 
 ```shell
 export SERVICE_NAME=nuxeo.endpoints.hyl-is-marketplace.cloud.goog
 crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REGISTRY/nuxeo:$TAG
+crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REGISTRY/ubbagent:$TAG
 ```
 
 You can check on the added annotation with:
