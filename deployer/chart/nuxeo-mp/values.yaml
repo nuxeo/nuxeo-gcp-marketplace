@@ -12,6 +12,45 @@ nuxeo:
     path: null
     tls:
       secretName: nuxeo-tls
+  # Billing agent sidecar
+  extraContainers:
+  - name: ubbagent
+    image: "{{ .Values.ubbagent.image.repository }}:{{ .Values.ubbagent.image.tag }}"
+    env:
+    - name: AGENT_CONFIG_FILE
+      value: /etc/ubbagent/config.yaml
+    - name: AGENT_LOCAL_PORT
+      value: "4567"
+    - name: AGENT_REPORT_DIR
+      value: /var/lib/ubbagent/reports
+    - name: AGENT_STATE_DIR
+      value: /var/lib/ubbagent
+    - name: AGENT_ENCODED_KEY
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Values.ubbagent.reportingSecret }}"
+          key: reporting-key
+    - name: AGENT_CONSUMER_ID
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Values.ubbagent.reportingSecret }}"
+          key: consumer-id
+    volumeMounts:
+    - name: ubbagent-config
+      mountPath: /etc/ubbagent
+    - name: ubbagent-state
+      mountPath: /var/lib/ubbagent
+  extraVolumes:
+  - name: ubbagent-config
+    configMap:
+      name: ubbagent-config
+  - name: ubbagent-state
+    emptyDir: {}
+  ubbagent:
+    image:
+      repository: gcr.io/cloud-marketplace-tools/metering/ubbagent
+      tag: 1.0.0
+    reportingSecret: null
 tls:
   base64EncodedPrivateKey: null
   base64EncodedCertificate: null

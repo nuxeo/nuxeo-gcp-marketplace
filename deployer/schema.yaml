@@ -13,6 +13,12 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         nuxeo.image.tag:
           type: TAG
+    ubbagent:
+      properties:
+        nuxeo.ubbagent.image.repository:
+          type: REPO_WITH_REGISTRY
+        nuxeo.ubbagent.image.tag:
+          type: TAG
   clusterConstraints:
     resources:
     - replicas: 1
@@ -41,6 +47,10 @@ properties:
         - type: Role
           rulesType: PREDEFINED
           rulesFromRoleName: view
+  nuxeo.ubbagent.reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
   nuxeo.ingress.enabled:
     type: boolean
     x-google-marketplace:
