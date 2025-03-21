@@ -4,6 +4,10 @@ nuxeo:
     tag: 1.0.0
   serviceAccount:
     create: false
+  startupProbe:
+    # It seems that in the test GKE clusters, the Nuxeo container takes a longer time to startup.
+    # Let's wait for 2 minutes before running the readiness and liveness probes.
+    initialDelaySeconds: 120
   ingress:
     # true if `INGRESS_AVAILABLE` is true, aka the cluster has an Ingress controller
     enabled: false
