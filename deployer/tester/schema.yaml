@@ -1,6 +1,9 @@
-properties:
-  image:
-    type: string
-    default: $REGISTRY/tester:$TAG
-    x-google-property:
-      type: IMAGE
+x-google-marketplace:
+  schemaVersion: v2
+  images:
+    tester:
+      properties:
+        tester.image.repository:
+          type: REPO_WITH_REGISTRY
+        tester.image.tag:
+          type: TAG

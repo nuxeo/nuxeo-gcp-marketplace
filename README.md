@@ -417,14 +417,12 @@ Build and push the deployer and tester images, then run the tests:
 ```shell
 docker buildx build \
   --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
-  --build-arg REGISTRY=$REGISTRY \
-  --build-arg TAG=$TAG \
   --no-cache \
   --tag $REGISTRY/deployer:$TAG \
   --provenance=false \
   --push \
   deployer \
-  && docker buildx  build \
+  && docker buildx build \
     --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
     --no-cache \
     --tag $REGISTRY/tester:$TAG \

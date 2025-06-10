@@ -10,7 +10,7 @@ spec:
   serviceAccountName: {{ .Release.Name }}-deployer-sa
   containers:
   - name: tester
-    image: {{ .Values.image }}
+    image: "{{ .Values.tester.image.repository }}:{{ .Values.tester.image.tag }}"
     imagePullPolicy: Always
     env:
     - name: NAMESPACE
