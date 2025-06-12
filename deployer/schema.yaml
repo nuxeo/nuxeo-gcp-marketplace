@@ -19,6 +19,13 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         nuxeo.ubbagent.image.tag:
           type: TAG
+    # Required by GCP Marketplace verification service to copy this image to the verification repository
+    tester:
+      properties:
+        tester.image.repository:
+          type: REPO_WITH_REGISTRY
+        tester.image.tag:
+          type: TAG
   clusterConstraints:
     resources:
     - replicas: 1
