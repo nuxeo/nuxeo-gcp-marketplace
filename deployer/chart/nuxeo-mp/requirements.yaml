@@ -1,4 +1,0 @@
-dependencies:
-- name: nuxeo
-  version: 3.1.12
-  repository: https://packages.nuxeo.com/repository/helm-releases-public/

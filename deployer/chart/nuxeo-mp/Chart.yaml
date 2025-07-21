@@ -3,3 +3,7 @@ description: Wrapper chart for the Nuxeo application on Google Cloud Marketplace
 name: nuxeo-mp
 version: 1.1.0
 appVersion: "2023.30"
+dependencies:
+  - name: nuxeo
+    version: ~3.1.0
+    repository: https://packages.nuxeo.com/repository/helm-releases-public/
