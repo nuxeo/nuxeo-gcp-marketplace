@@ -465,8 +465,6 @@ Build the deployer image and install the application in the test namespace.
 ```shell
 docker buildx build \
   --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
-  --build-arg REGISTRY=$REGISTRY \
-  --build-arg TAG=$TAG \
   --no-cache \
   --tag $REGISTRY/deployer:$TAG \
   --provenance=false \
