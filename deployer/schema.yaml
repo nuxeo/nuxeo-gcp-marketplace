@@ -28,10 +28,10 @@ x-google-marketplace:
           type: TAG
   clusterConstraints:
     resources:
-    - replicas: 1
-      requests:
-        cpu: '2'
-        memory: '4Gi'
+      - replicas: 1
+        requests:
+          cpu: '2'
+          memory: '4Gi'
     istio:
       type: UNSUPPORTED
 properties:
@@ -50,10 +50,11 @@ properties:
       serviceAccount:
         description: >
           Nuxeo deployment service account.
+
         roles:
-        - type: Role
-          rulesType: PREDEFINED
-          rulesFromRoleName: view
+          - type: Role
+            rulesType: PREDEFINED
+            rulesFromRoleName: view
   nuxeo.ubbagent.reportingSecret:
     type: string
     x-google-marketplace:
@@ -91,8 +92,8 @@ properties:
     type: string
     default: singleNode
     enum:
-    - 'singleNode'
-    - 'api-worker'
+      - 'singleNode'
+      - 'api-worker'
   nuxeo.replicaCount:
     title: Number of Nuxeo pods
     type: integer
@@ -209,9 +210,9 @@ properties:
     type: string
     title: "Google Cloud Storage bucket prefix, needs to end with '/'"
   nuxeo.persistentVolumeStorage.enabled:
-     title: Enable persistent volume storage for Nuxeo binaries
-     type: boolean
-     default: false
+    title: Enable persistent volume storage for Nuxeo binaries
+    type: boolean
+    default: false
   nuxeo.persistentVolumeStorage.storageClass:
     title: Nuxeo binaries persistent volume storage class
     type: string
@@ -263,5 +264,5 @@ properties:
     title: Maximum number of pods that can be unavailable during a disruption
     type: string
 required:
-- name
-- namespace
+  - name
+  - namespace
