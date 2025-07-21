@@ -1,6 +1,6 @@
 dependencies:
 - name: nuxeo
   repository: https://packages.nuxeo.com/repository/helm-releases-public/
-  version: 3.1.12
-digest: sha256:8646fbd5e1b785d3810e9fe7cc24c9ab16cc90cff9c4704eab8af1115d00c916
-generated: "2025-03-17T11:42:52.55628835+01:00"
+  version: 3.1.17
+digest: sha256:fa50dc0a8ecdcebbd3ff0793fd0f15ebb25f9dad285bc26e51c0169cddfad8f6
+generated: "2025-07-21T11:14:14.395523572+02:00"
