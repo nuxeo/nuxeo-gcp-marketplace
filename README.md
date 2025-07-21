@@ -402,9 +402,11 @@ You can check on the added annotation with:
 docker buildx imagetools inspect $REGISTRY/nuxeo:$TAG --raw | jq .annotations
 ```
 
-Then, read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
+Install [Skaffold](https://skaffold.dev/docs/install/) v2 and make sure that the [docker-buildx](https://github.com/nuxeo/platform-builder-base/blob/main/_common/rootfs/usr/local/bin/docker-buildx) script is present in your `PATH` environment variable.
 
-Finally, you need to update the chart dependencies to fetch the `nuxeo` subchart locally.
+Read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
+
+Update the chart dependencies to fetch the `nuxeo` subchart locally.
 
 ```shell
 helm dependency update deployer/chart/nuxeo-mp/
@@ -414,25 +416,18 @@ helm dependency update deployer/chart/nuxeo-mp/
 
 Build and push the deployer and tester images, then run the tests:
 
+> [!NOTE]
+> We need to push the images to a registry to allow building them with annotations, and to be pulled from the Kubernetes cluster when running `mpdev verify`.
+
 ```shell
-docker buildx build \
-  --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
-  --no-cache \
-  --tag $REGISTRY/deployer:$TAG \
-  --provenance=false \
-  --push \
-  deployer \
-  && docker buildx build \
-    --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
-    --no-cache \
-    --tag $REGISTRY/tester:$TAG \
-    --provenance=false \
-    --push \
-    tester \
+VERSION=$TAG PUSH_IMAGE=true skaffold build --default-repo=$REGISTRY \
   && mpdev verify --deployer=$REGISTRY/deployer:$TAG
 ```
 
 You can have a look at the [Verification system](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/verification-integration.md) documentation and the [Dev container references](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
+
+> [!WARNING]
+> Make sure you delete the images pushed to the Artifact Registry afterwards.
 
 ### Deploy a test application
 
@@ -463,13 +458,7 @@ kubectl delete job test-deployment-deployer \
 Build the deployer image and install the application in the test namespace.
 
 ```shell
-docker buildx build \
-  --annotation "com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME" \
-  --no-cache \
-  --tag $REGISTRY/deployer:$TAG \
-  --provenance=false \
-  --push \
-  deployer \
+VERSION=$TAG PUSH_IMAGE=true skaffold build --default-repo=$REGISTRY \
   && mpdev install \
     --deployer=$REGISTRY/deployer:$TAG \
     --parameters='{"name": "test-deployment", "namespace": "test-namespace"}'
