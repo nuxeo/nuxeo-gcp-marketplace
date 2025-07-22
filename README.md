@@ -44,12 +44,6 @@ environment by default.
 - [openssl](https://www.openssl.org/)
 - [helm](https://helm.sh/)
 
-Configure `gcloud` as a Docker credential helper:
-
-```shell
-gcloud auth configure-docker
-```
-
 ##### Create a Google Kubernetes Engine (GKE) cluster
 
 Create a new cluster from the command line:
@@ -111,10 +105,10 @@ export NAMESPACE=mynamespace
 export APP_INSTANCE=mynuxeo
 ```
 
-Configure the container image registry:
+Configure the container image repository:
 
 ```shell
-export REGISTRY=marketplace.gcr.io/hyland/nuxeo
+export REPOSITORY=marketplace.gcr.io/hyland/nuxeo
 ```
 
 Set up the image tag:
@@ -185,7 +179,7 @@ Use `helm install` to install the application in the target namespace.
 ```shell
 helm install "$APP_INSTANCE" . \
   --namespace "$NAMESPACE" \
-  --set nuxeo.image.repository="$REGISTRY" \
+  --set nuxeo.image.repository="$REPOSITORY" \
   --set nuxeo.image.tag="$TAG" \
   --set nuxeo.ingress.enabled="$PUBLIC_SERVICE_AND_INGRESS_ENABLED" \
   --set tls.base64EncodedPrivateKey="$TLS_CERTIFICATE_KEY" \
@@ -272,7 +266,7 @@ Set your environment variables to match the installation properties:
 ```shell
 export NAMESPACE=mynamespace
 export APP_INSTANCE=mynuxeo
-export REGISTRY=marketplace.gcr.io/hyland/nuxeo
+export REPOSITORY=marketplace.gcr.io/hyland/nuxeo
 ```
 
 ### Upgrade Nuxeo
@@ -288,7 +282,7 @@ Upgrade the Helm release with the reference to the new image:
 ```shell
 helm upgrade "$APP_INSTANCE" . \
   --namespace "$NAMESPACE" \
-  --set nuxeo.image.repository="$REGISTRY" \
+  --set nuxeo.image.repository="$REPOSITORY" \
   --set nuxeo.image.tag="$TAG"
 ```
 
@@ -359,13 +353,13 @@ You are connected with `glcoud` to a test GKE cluster in a given project, that c
 export GCP_PROJECT=$(gcloud config get-value project | tr ':' '/')
 ```
 
-There is an Artifact Registry in this GCP project, for instance:
+There is an Artifact Registry repository in this GCP project, for instance:
 
 ```shell
 us-docker.pkg.dev/$GCP_PROJECT/nuxeo
 ```
 
-A Nuxeo image and a [metering agent](https://github.com/GoogleCloudPlatform/ubbagent) image have been pushed to this registry, for instance:
+A Nuxeo image and a [metering agent](https://github.com/GoogleCloudPlatform/ubbagent) image have been pushed to this repository, for instance:
 
 ```shell
 us-docker.pkg.dev/$GCP_PROJECT/nuxeo/nuxeo:1.0.0
@@ -375,7 +369,7 @@ us-docker.pkg.dev/$GCP_PROJECT/nuxeo/ubbagent:1.0.0
 For convinience, you can define the following environment variables:
 
 ```shell
-export REGISTRY=us-docker.pkg.dev/$GCP_PROJECT/nuxeo
+export REPOSITORY=us-docker.pkg.dev/$GCP_PROJECT/nuxeo
 export TAG="1.0.0"
 ```
 
@@ -392,37 +386,55 @@ To avoid rebuilding the images, you can add this annotation to the existing imag
 
 ```shell
 export SERVICE_NAME=nuxeo.endpoints.hyl-is-marketplace.cloud.goog
-crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REGISTRY/nuxeo:$TAG
-crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REGISTRY/ubbagent:$TAG
+crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REPOSITORY/nuxeo:$TAG
+crane mutate --annotation com.googleapis.cloudmarketplace.product.service.name=services/$SERVICE_NAME $REPOSITORY/ubbagent:$TAG
 ```
 
 You can check on the added annotation with:
 
 ```shell
-docker buildx imagetools inspect $REGISTRY/nuxeo:$TAG --raw | jq .annotations
+docker buildx imagetools inspect $REPOSITORY/nuxeo:$TAG --raw | jq .annotations
+```
+
+Configure `gcloud` as the Docker credential helper for all Google-supported Docker registries, along with `us-docker.pkg.dev`:
+
+```shell
+gcloud auth configure-docker
+gcloud auth configure-docker us-docker.pkg.dev
 ```
 
 Install [Skaffold](https://skaffold.dev/docs/install/) v2 and make sure that the [docker-buildx](https://github.com/nuxeo/platform-builder-base/blob/main/_common/rootfs/usr/local/bin/docker-buildx) script is present in your `PATH` environment variable.
 
 Read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/tool-prerequisites.md#tool-prerequisites) documentation.
 
-Update the chart dependencies to fetch the `nuxeo` subchart locally.
+### Build deployer and tester images
+
+Update the chart dependencies to fetch the `nuxeo` subchart locally:
 
 ```shell
 helm dependency update deployer/chart/nuxeo-mp/
 ```
 
-### Run the verification tests
+Build and push the deployer and tester images:
 
-Build and push the deployer and tester images, then run the tests:
+```shell
+VERSION=$TAG PUSH_IMAGE=true skaffold build --default-repo=$REPOSITORY
+```
 
 > [!NOTE]
 > We need to push the images to a registry to allow building them with annotations, and to be pulled from the Kubernetes cluster when running `mpdev verify`.
 
+### Run the verification tests
+
 ```shell
-VERSION=$TAG PUSH_IMAGE=true skaffold build --default-repo=$REGISTRY \
-  && mpdev verify --deployer=$REGISTRY/deployer:$TAG
+mpdev /bin/bash -c "\
+  gcloud -q auth configure-docker us-docker.pkg.dev; \
+  verify --deployer=$REPOSITORY/deployer:$TAG \
+"
 ```
+
+> [!NOTE]
+> We need to configure `gcloud` as a Docker credential helper for `us-docker.pkg.dev`, as it is not the case by default in the `mpdev` image.
 
 You can have a look at the [Verification system](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/verification-integration.md) documentation and the [Dev container references](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
 
@@ -455,13 +467,21 @@ kubectl delete job test-deployment-deployer \
   --ignore-not-found=true
 ```
 
-Build the deployer image and install the application in the test namespace.
+Build and push the deployer image:
 
 ```shell
-VERSION=$TAG PUSH_IMAGE=true skaffold build --default-repo=$REGISTRY \
-  && mpdev install \
-    --deployer=$REGISTRY/deployer:$TAG \
+VERSION=$TAG PUSH_IMAGE=true skaffold build --default-repo=$REPOSITORY
+```
+
+Install the application in the test namespace:
+
+```shell
+mpdev /bin/bash -c "\
+  gcloud -q auth configure-docker us-docker.pkg.dev; \
+  install \
+    --deployer=$REPOSITORY/deployer:$TAG \
     --parameters='{"name": "test-deployment", "namespace": "test-namespace"}'
+"
 ```
 
 You can have a look at the [Helm deployer](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/building-deployer-helm.md#first-deployment) documentation.
