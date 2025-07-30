@@ -27,7 +27,7 @@ build:
             --build-arg SCM_REF={{.GIT_COMMIT}} \
             --build-arg NUXEO_VERSION={{.NUXEO_VERSION}} \
             --oci-mediatypes false \
-            --annotation "com.googleapis.cloudmarketplace.product.service.name=services/{{.SERVICE_NAME}}" \
+            --annotation "{{.GCP_MARKETPLACE_ANNOTATION_KEY}}={{.GCP_MARKETPLACE_ANNOTATION_VALUE}}" \
     - image: tester
       context: tester
       custom:
@@ -37,4 +37,4 @@ build:
             --build-arg SCM_REF={{.GIT_COMMIT}} \
             --build-arg NUXEO_VERSION={{.NUXEO_VERSION}} \
             --oci-mediatypes false \
-            --annotation "com.googleapis.cloudmarketplace.product.service.name=services/{{.SERVICE_NAME}}" \
+            --annotation "{{.GCP_MARKETPLACE_ANNOTATION_KEY}}={{.GCP_MARKETPLACE_ANNOTATION_VALUE}}" \
