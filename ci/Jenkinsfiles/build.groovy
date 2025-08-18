@@ -82,8 +82,6 @@ pipeline {
     githubProjectProperty(projectUrlStr: "https://github.com/nuxeo/${REPOSITORY}")
   }
   environment {
-    // Required for the mpdev bind mounts to work
-    HOME = '/home/jenkins'
     LOG_DIR_MPDEV_DOCTOR = '.mpdev_doctor_logs'
     LOG_DIR_MPDEV_VERIFY = '.mpdev_verify_logs'
     DEPLOYER_SCHEMA = 'deployer/schema.yaml'
@@ -166,6 +164,8 @@ pipeline {
     }
     stage('Check mpdev') {
       environment {
+        // Required for the mpdev bind mounts to work
+        HOME = '/home/jenkins'
         VERIFICATION_LOGS_PATH = "${HOME}/${LOG_DIR_MPDEV_DOCTOR}"
       }
       steps {
@@ -190,6 +190,8 @@ pipeline {
     }
     stage('Test') {
       environment {
+        // Required for the mpdev bind mounts to work
+        HOME = '/home/jenkins'
         VERIFICATION_LOGS_PATH = "${HOME}/${LOG_DIR_MPDEV_VERIFY}"
       }
       steps {
@@ -210,8 +212,6 @@ pipeline {
                 from: "${REPOSITORY_STAGING}/${IMAGE_UBBAGENT}:${MINOR_VERSION}",
                 to: "${REPOSITORY_TEST}/${IMAGE_UBBAGENT}:${VERSION}"
               )
-
-              sh 'mpdev doctor'
 
               // To allow mpdev to pull images from the "us-docker.pkg.dev" artifact registry, we need to configure
               // gcloud as a Docker credential helper for this registry
