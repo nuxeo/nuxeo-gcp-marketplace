@@ -57,10 +57,10 @@ def createJiraIssue(nuxeoVersion, newRelease) {
     issuetype: ['name': 'Task'],
     summary: "Upgrade Nuxeo to LTS ${nuxeoVersion} in the Google Cloud Marketplace",
     description: """
-      Please follow the documentation about [Updating an existing version|https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version].
+Please follow the documentation about [Updating an existing version|https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version].
 
-      Update the Display Tag of the current release to the ${newRelease} release.
-    """.trim().stripIndent(),
+Update the Display Tag of the current release to the ${newRelease} release.
+""".trim(),
     components: [['name': 'Cloud']],
     customfield_13956: ['nxplatform'], // Tags
     customfield_10104: 16458, // Sprint: nxplatform next
@@ -322,18 +322,18 @@ pipeline {
                 def issueKey = createJiraIssue(NUXEO_VERSION, MINOR_VERSION)
 
                 env.NOTIFICATION_MESSAGE = """
-                  Make sure to address [${issueKey}](${JIRA_BROWSE_URL}${issueKey}) to upgrade Nuxeo to LTS
-                  ${NUXEO_VERSION} in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}).
-                """.trim().stripIndent()
+Make sure to address [${issueKey}](${JIRA_BROWSE_URL}${issueKey}) to upgrade Nuxeo to LTS
+${NUXEO_VERSION} in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}).
+""".trim()
               } else { // e.g. 1.1.1
                 echo 'Patch version'
                 env.NOTIFICATION_MESSAGE = """
-                  To upgrade Nuxeo to this patch version in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}),
-                  please follow the documentation about
-                  [Updating an existing version](https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version).
+To upgrade Nuxeo to this patch version in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}),
+please follow the documentation about
+[Updating an existing version](https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version).
 
-                  Update the Display Tag of the current release to the new Deployer digest for the same release.
-                """.trim().stripIndent()
+Update the Display Tag of the current release to the new Deployer digest for the same release.
+""".trim()
               }
             }
           }
@@ -389,7 +389,7 @@ pipeline {
           if (env.NOTIFICATION_MESSAGE) {
             message += """
 
-              ${NOTIFICATION_MESSAGE}""".stripIndent()
+${NOTIFICATION_MESSAGE}"""
           }
           nxTeams.success(
             subtitle: null,
