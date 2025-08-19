@@ -198,7 +198,10 @@ pipeline {
 
             def issueKey = createJiraIssue(NUXEO_RELEASE_VERSION, JIRA_MOVING_VERSION)
 
+            def currentBranch = GIT_BRANCH.split('/')[1]
+            sh "git checkout ${currentBranch}"
             nxGit.commitPush(
+              branch: currentBranch,
               message: "${issueKey}: Upgrade Nuxeo from ${NUXEO_CURRENT_VERSION} to ${NUXEO_RELEASE_VERSION}, update ${DEPLOYER_CURRENT_VERSION} to ${DEPLOYER_NEXT_VERSION}"
             )
 
