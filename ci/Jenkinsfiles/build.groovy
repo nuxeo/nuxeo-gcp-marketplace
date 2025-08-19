@@ -59,6 +59,8 @@ def createJiraIssue(nuxeoVersion, newRelease) {
     description: """
 Please follow the documentation about [Updating an existing version|https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version].
 
+Direct link to the **Container images** section: https://console.cloud.google.com/producer-portal/listing-edit/nuxeo.endpoints.hyl-is-marketplace.cloud.goog;stepId=kubernetesImages
+
 Update the Display Tag of the current release to the ${newRelease} release.
 """.trim(),
     components: [['name': 'Cloud']],
@@ -328,7 +330,7 @@ ${NUXEO_VERSION} in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}).
               } else { // e.g. 1.1.1
                 echo 'Patch version'
                 env.NOTIFICATION_MESSAGE = """
-To upgrade Nuxeo to this patch version in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}),
+To upgrade the Nuxeo software to this patch version in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}),
 please follow the documentation about
 [Updating an existing version](https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version).
 
