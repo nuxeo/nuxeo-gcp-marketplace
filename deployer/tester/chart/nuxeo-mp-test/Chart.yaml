@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Tester chart for the Nuxeo application on Google Cloud Marketplace
 name: nuxeo-mp-test
-version: 1.1-SNAPSHOT
+version: 2.0-SNAPSHOT
