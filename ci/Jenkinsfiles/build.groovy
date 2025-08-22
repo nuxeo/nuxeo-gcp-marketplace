@@ -57,9 +57,9 @@ def createJiraIssue(nuxeoVersion, newRelease) {
     issuetype: ['name': 'Task'],
     summary: "Upgrade Nuxeo to LTS ${nuxeoVersion} in the Google Cloud Marketplace",
     description: """
-Please follow the documentation about [Updating an existing version|https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version].
+Please follow the documentation about [Updating an existing version|${GCP_MARKETPLACE_UPDATE_DOC_URL}].
 
-Direct link to the **Container images** section: https://console.cloud.google.com/producer-portal/listing-edit/nuxeo.endpoints.hyl-is-marketplace.cloud.goog;stepId=kubernetesImages
+Direct link to the *Container images* section: https://console.cloud.google.com/producer-portal/listing-edit/nuxeo.endpoints.hyl-is-marketplace.cloud.goog;stepId=kubernetesImages
 
 Update the Display Tag of the current release to the ${newRelease} release.
 """.trim(),
@@ -102,7 +102,8 @@ pipeline {
     IMAGE_UBBAGENT = 'ubbagent'
     GCP_MARKETPLACE_ANNOTATION_KEY = 'com.googleapis.cloudmarketplace.product.service.name'
     GCP_MARKETPLACE_ANNOTATION_VALUE = 'services/nuxeo.endpoints.hyl-is-marketplace.cloud.goog'
-    GCP_MARKETPLACE_LINK = 'https://console.cloud.google.com/marketplace/product/hyl-is-marketplace/nuxeo'
+    GCP_MARKETPLACE_URL = 'https://console.cloud.google.com/marketplace/product/hyl-is-marketplace/nuxeo'
+    GCP_MARKETPLACE_UPDATE_DOC_URL = 'https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version'
     CURRENT_VERSION = getYamlVersion(DEPLOYER_CHART, 'version') // e.g. 1.1-SNAPSHOT
     VERSION = nxUtils.getVersion(baseVersion: CURRENT_VERSION) // e.g. 1.1.1
     MINOR_VERSION = nxUtils.getMajorDotMinorVersion(version: VERSION) // e.g. 1.1
@@ -322,20 +323,24 @@ pipeline {
                   Marketplace
                 """.stripIndent()
                 def issueKey = createJiraIssue(NUXEO_VERSION, MINOR_VERSION)
-
+                def issueUrl = "${JIRA_BROWSE_URL}${issueKey}"
                 env.NOTIFICATION_MESSAGE = """
-Make sure to address [${issueKey}](${JIRA_BROWSE_URL}${issueKey}) to upgrade Nuxeo to LTS
-${NUXEO_VERSION} in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}).
+Make sure to address [${issueKey}](${issueUrl}) to upgrade Nuxeo to LTS
+${NUXEO_VERSION} in the [Google Cloud Marketplace](${GCP_MARKETPLACE_URL}).
 """.trim()
+                env.NOTIFICATION_ACTION_NAME = 'View Jira issue'
+                env.NOTIFICATION_ACTION_URL = issueUrl
               } else { // e.g. 1.1.1
                 echo 'Patch version'
                 env.NOTIFICATION_MESSAGE = """
-To upgrade the Nuxeo software to this patch version in the [Google Cloud Marketplace](${GCP_MARKETPLACE_LINK}),
+To upgrade the Nuxeo software to this patch version in the [Google Cloud Marketplace](${GCP_MARKETPLACE_URL}),
 please follow the documentation about
-[Updating an existing version](https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product#updating_an_existing_version).
+[Updating an existing version](${GCP_MARKETPLACE_UPDATE_DOC_URL}).
 
 Update the Display Tag of the current release to the new Deployer digest for the same release.
 """.trim()
+                env.NOTIFICATION_ACTION_NAME = 'View documentation'
+                env.NOTIFICATION_ACTION_URL = GCP_MARKETPLACE_UPDATE_DOC_URL
               }
             }
           }
@@ -397,6 +402,13 @@ ${NOTIFICATION_MESSAGE}"""
             subtitle: null,
             message: message,
             changes: true,
+            actions: [[
+              name: 'View build',
+              url: RUN_DISPLAY_URL
+            ], [
+              name: NOTIFICATION_ACTION_NAME,
+              url: NOTIFICATION_ACTION_URL
+            ]],
           )
         }
       }
