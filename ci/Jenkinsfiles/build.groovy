@@ -360,8 +360,18 @@ Update the Display Tag of the current release to the new Deployer digest for the
               Release
               ----------------------------------------
               """.stripIndent()
+              def issueFetchers = [
+                [
+                  type: 'github_dependabot',
+                ],
+                [
+                  type          : 'jira',
+                  jql           : "project = ${JIRA_PROJECT} and fixVersion = ${JIRA_MOVING_VERSION}",
+                  computeCommits: true,
+                ],
+              ]
               nxProject.release(
-                jql: "project = ${JIRA_PROJECT} and fixVersion = ${JIRA_MOVING_VERSION}",
+                issuesFetchers: issueFetchers,
                 newJiraVersion: [
                   project    : env.JIRA_PROJECT,
                   name       : env.JIRA_RELEASED_VERSION,
@@ -370,7 +380,6 @@ Update the Display Tag of the current release to the new Deployer digest for the
                   released   : true,
                 ],
                 jiraMovingVersionName: env.JIRA_MOVING_VERSION,
-                computeCommits: true,
               )
             }
           }
