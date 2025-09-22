@@ -16,7 +16,7 @@
 * Contributors:
 *     Antoine Taillefer <antoine.taillefer@hyland.com>
 */
-library identifier: "platform-ci-shared-library@v0.0.70"
+library identifier: "platform-ci-shared-library@v0.0.75"
 
 boolean isMinorUpgrade(nuxeoCurrentVersion, nuxeoReleaseVersion) {
   return nxUtils.getMajorVersion(version: nuxeoReleaseVersion) == nxUtils.getMajorVersion(version: nuxeoCurrentVersion)
