@@ -84,6 +84,8 @@ pipeline {
     githubProjectProperty(projectUrlStr: "https://github.com/nuxeo/${REPOSITORY}")
   }
   environment {
+    NUXEO_CHART = 'nuxeo'
+    NUXEO_CHART_REPOSITORY = 'https://packages.nuxeo.com/repository/helm-releases-public/'
     LOG_DIR_MPDEV_DOCTOR = '.mpdev_doctor_logs'
     LOG_DIR_MPDEV_VERIFY = '.mpdev_verify_logs'
     DEPLOYER_SCHEMA = 'deployer/schema.yaml'
@@ -159,7 +161,8 @@ pipeline {
             Build
             ----------------------------------------
             """.stripIndent()
-            sh "helm dependency update ${DEPLOYER_CHART_DIR}"
+            sh "helm repo add ${NUXEO_CHART} ${NUXEO_CHART_REPOSITORY}"
+            sh "helm dependency build ${DEPLOYER_CHART_DIR}"
             sh "skaffold build --default-repo=${REPOSITORY_TEST}"
           }
         }
