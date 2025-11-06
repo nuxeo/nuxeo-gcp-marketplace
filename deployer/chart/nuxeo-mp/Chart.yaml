@@ -5,5 +5,5 @@ version: 2.4-SNAPSHOT
 appVersion: 2025.10
 dependencies:
   - name: nuxeo
-    version: ~3.1.0
+    version: 3.1.23
     repository: https://packages.nuxeo.com/repository/helm-releases-public/
