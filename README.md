@@ -168,10 +168,11 @@ kubectl create namespace "$NAMESPACE"
 
 ##### Install the Helm chart
 
-Update the chart dependencies to fetch the `nuxeo` subchart locally.
+Build the chart dependencies to fetch the `nuxeo` subchart locally.
 
 ```shell
-helm dependency update .
+helm add repo nuxeo https://packages.nuxeo.com/repository/helm-releases-public/
+helm dependency build .
 ```
 
 Use `helm install` to install the application in the target namespace.
@@ -409,10 +410,11 @@ Read the [Tool Prerequisites](https://github.com/GoogleCloudPlatform/marketplace
 
 ### Build deployer and tester images
 
-Update the chart dependencies to fetch the `nuxeo` subchart locally:
+Build the chart dependencies to fetch the `nuxeo` subchart locally:
 
 ```shell
-helm dependency update deployer/chart/nuxeo-mp/
+helm add repo nuxeo https://packages.nuxeo.com/repository/helm-releases-public/
+helm dependency build deployer/chart/nuxeo-mp/
 ```
 
 Build and push the deployer and tester images:
