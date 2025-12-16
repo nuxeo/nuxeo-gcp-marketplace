@@ -1,4 +1,4 @@
 tester:
   image:
     repository: us-docker.pkg.dev/hyl-is-marketplace/nuxeo/tester
-    tag: 2.5
+    tag: 2.6
