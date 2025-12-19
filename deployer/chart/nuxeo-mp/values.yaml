@@ -52,8 +52,8 @@ nuxeo:
       emptyDir: {}
   ubbagent:
     image:
-      repository: gcr.io/cloud-marketplace-tools/metering/ubbagent
-      tag: latest
+      repository: us-docker.pkg.dev/hyl-is-marketplace/nuxeo/ubbagent
+      tag: 2.6
     reportingSecret: null
 tls:
   base64EncodedPrivateKey: null
