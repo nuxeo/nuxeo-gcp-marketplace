@@ -1,9 +1,9 @@
 x-google-marketplace:
   schemaVersion: v2
   applicationApiVersion: v1beta1
-  publishedVersion: 2.9-SNAPSHOT
+  publishedVersion: 2.10-SNAPSHOT
   publishedVersionMetadata:
-    releaseNote: Upgrade Nuxeo Docker image to 2025.15.
+    releaseNote: Upgrade Nuxeo Docker image to 2025.16.
     recommended: true
   images:
     nuxeo:
