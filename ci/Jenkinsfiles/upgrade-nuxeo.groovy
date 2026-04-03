@@ -187,6 +187,7 @@ pipeline {
             setYamlValue(DEPLOYER_SCHEMA, 'x-google-marketplace.publishedVersion', DEPLOYER_NEXT_VERSION)
             setYamlValue(DEPLOYER_CHART, 'version', DEPLOYER_NEXT_VERSION)
             setYamlValue(DEPLOYER_VALUES, 'nuxeo.image.tag', NEXT_RELEASE_TRACK)
+            setYamlValue(DEPLOYER_VALUES, 'nuxeo.ubbagent.image.tag', NEXT_RELEASE_TRACK)
             setYamlValue(TESTER_CHART, 'version', DEPLOYER_NEXT_VERSION)
             setYamlValue(TESTER_VALUES, 'tester.image.tag', NEXT_RELEASE_TRACK)
             setYamlValue(DEPLOYER_CHART, 'appVersion', NUXEO_RELEASE_VERSION)
