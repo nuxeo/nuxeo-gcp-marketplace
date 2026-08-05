@@ -1,8 +1,8 @@
 apiVersion: v2
 description: Wrapper chart for the Nuxeo application on Google Cloud Marketplace
 name: nuxeo-mp
-version: 2.16-SNAPSHOT
-appVersion: 2025.22
+version: 2.17-SNAPSHOT
+appVersion: 2025.23
 dependencies:
   - name: nuxeo
     version: 3.1.25
