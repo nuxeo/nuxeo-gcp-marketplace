@@ -1,15 +1,16 @@
 #!/bin/sh
 
-curlCommand="curl $1/runningstatus -v --retry $2 --retry-connrefused"
-echo "Ruuning command: $curlCommand"
-runningStatus=$($curlCommand)
-echo Running status: $runningStatus
+set -eu
 
-runtimeStatus=$(echo $runningStatus | jq -r '.runtimeStatus')
-repositoryStatus=$(echo $runningStatus | jq -r '.repositoryStatus')
-streamStatus=$(echo $runningStatus | jq -r '.streamStatus')
+echo "Running command: curl $1/runningstatus -v --retry $2 --retry-connrefused"
+runningStatus=$(curl "$1/runningstatus" -v --retry "$2" --retry-connrefused)
+echo "Running status: $runningStatus"
 
-if [ "$runtimeStatus" = 'ok' -a "$repositoryStatus" = 'ok' -a "$streamStatus" = 'ok' ]; then
+runtimeStatus=$(printf '%s\n' "$runningStatus" | jq -r '.runtimeStatus')
+repositoryStatus=$(printf '%s\n' "$runningStatus" | jq -r '.repositoryStatus')
+streamStatus=$(printf '%s\n' "$runningStatus" | jq -r '.streamStatus')
+
+if [ "$runtimeStatus" = 'ok' ] && [ "$repositoryStatus" = 'ok' ] && [ "$streamStatus" = 'ok' ]; then
   exit 0
 else
   exit 1

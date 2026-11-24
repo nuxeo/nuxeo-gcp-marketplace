@@ -1,4 +1,4 @@
-FROM gcr.io/cloud-marketplace-tools/testrunner
+FROM marketplace.gcr.io/google/debian12
 
 ARG BUILD_TAG
 ARG SCM_REF
@@ -14,12 +14,10 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     curl \
     jq \
-    wget \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 COPY scripts /scripts
-COPY tests /tests
 
 WORKDIR /
 ENTRYPOINT ["/scripts/tester.sh"]
