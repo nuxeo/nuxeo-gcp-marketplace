@@ -16,6 +16,9 @@ ARG BUILD_TAG
 ARG SCM_REF
 ARG NUXEO_VERSION
 
+RUN --mount=type=bind,source=upgrade-tools.sh,target=/tmp/upgrade-tools.sh \
+  /bin/bash /tmp/upgrade-tools.sh
+
 LABEL org.nuxeo.build-tag=$BUILD_TAG
 LABEL org.nuxeo.scm-ref=$SCM_REF
 LABEL org.nuxeo.version=$NUXEO_VERSION
